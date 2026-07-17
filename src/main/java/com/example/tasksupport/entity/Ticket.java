@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tickets")
@@ -26,6 +27,26 @@ public class Ticket {
     private String status;
 
     @Column(name = "registration_date")
-    private String registrationDate;
+    private LocalDateTime registrationDate;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public LocalDateTime getRegistrationDate() {
+        return registrationDate;
+    }
 
 }
