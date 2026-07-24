@@ -10,20 +10,32 @@ import com.example.tasksupport.repository.TicketRepository;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 @Controller
 @RequestMapping("/tickets")
 public class TicketController {
 
     private final TicketRepository ticketRepository;
+
     public TicketController(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
     }
 
     @GetMapping
-    public String index(Model model) {
-        List<Ticket> tickets = ticketRepository.findAll();
-        model.addAttribute("tickets", tickets);
-        return "index";
+    public String index(@RequestParam(name = "status", required = false) String status, Model model) {
+
+        model.addAttribute("selectedStatus", status);
+
+        if (status != null && !status.isEmpty()) {
+            List<Ticket> tickets = ticketRepository.findByStatus(status);
+            model.addAttribute("tickets", tickets);
+            return "index";
+        } else {
+            List<Ticket> tickets = ticketRepository.findAll();
+            model.addAttribute("tickets", tickets);
+            return "index";
+        }
     }
 
 }
