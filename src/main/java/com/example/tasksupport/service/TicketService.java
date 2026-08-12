@@ -6,7 +6,10 @@ import com.example.tasksupport.repository.TicketRepository;
 import com.example.tasksupport.entity.Ticket;
 
 import java.time.LocalDateTime;
-import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Page;
 
 @Service
 public class TicketService {
@@ -17,24 +20,24 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
-    public List<Ticket> findTickets(String title, String status) {
+    public Page<Ticket> findTickets(String title, String status, Pageable pageable) {
 
         boolean hasTitle = title != null && !title.isEmpty();
         boolean hasStatus = status != null && !status.isEmpty();
 
         if (hasTitle && hasStatus) {
-            return ticketRepository.findByTitleContainingAndStatus(title, status);
+            return ticketRepository.findByTitleContainingAndStatus(title, status, pageable);
         }
 
         if (hasTitle) {
-            return ticketRepository.findByTitleContaining(title);
+            return ticketRepository.findByTitleContaining(title, pageable);
         }
 
         if (hasStatus) {
-            return ticketRepository.findByStatus(status);
+            return ticketRepository.findByStatus(status, pageable);
         }
 
-        return ticketRepository.findAll();
+        return ticketRepository.findAll(pageable);
     }
 
     public void createTicket(String title, String priority) {

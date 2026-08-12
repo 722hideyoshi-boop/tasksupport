@@ -61,6 +61,45 @@
             </tr>
         </tbody>
     </table>
+
+    <div>
+
+        <a th:if="${!tickets.first}" th:href="@{/tickets(
+           page=${tickets.number - 1},
+           title=${title},
+           status=${selectedStatus}
+       )}">
+            前へ
+        </a>
+
+        <span th:each="pageNumber : ${#numbers.sequence(
+            tickets.number > 2 ? tickets.number - 2 : 0,
+            tickets.number + 2 < tickets.totalPages ? tickets.number + 2 : tickets.totalPages - 1
+        )}">
+
+            <span th:if="${pageNumber == tickets.number}" th:text="${pageNumber + 1}">
+                1
+            </span>
+
+            <a th:if="${pageNumber != tickets.number}" th:href="@{/tickets(
+               page=${pageNumber},
+               title=${title},
+               status=${selectedStatus}
+           )}" th:text="${pageNumber + 1}">
+                1
+            </a>
+
+        </span>
+
+        <a th:if="${!tickets.last}" th:href="@{/tickets(
+           page=${tickets.number + 1},
+           title=${title},
+           status=${selectedStatus}
+       )}">
+            次へ
+        </a>
+
+    </div>
 </body>
 
 </html>
