@@ -7,4 +7,9 @@ import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     public List<Ticket> findByStatus(String status);
+
+    public List<Ticket> findByTitleContaining(String title);
+
+    public List<Ticket> findByTitleContainingAndStatus(String title, String status);
+
 }

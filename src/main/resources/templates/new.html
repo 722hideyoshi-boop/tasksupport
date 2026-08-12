@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>問い合わせ登録</title>
+</head>
+
+<body>
+
+    <h1>問い合わせ登録</h1>
+
+    <form th:action="@{/tickets}" th:object="${ticketRegisterForm}" method="post">
+        <p>タイトル</p>
+
+        <input type="text" th:field="*{title}">
+
+        <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+            タイトルの入力エラー
+        </p>
+
+
+        <p>優先度</p>
+        <select th:field="*{priority}">
+            <option value="低">低</option>
+            <option value="中">中</option>
+            <option value="高">高</option>
+        </select>
+
+        <button type="submit">登録</button>
+    </form>
+
+</body>
+
+</html>

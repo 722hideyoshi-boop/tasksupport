@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>問い合わせ編集</title>
+</head>
+
+<body>
+
+    <h1>問い合わせ編集</h1>
+
+    <form th:action="@{/tickets/{id}/update(id=${ticket.id})}" method="post">
+        <label>タイトル</label>
+
+        <input type="text" name="title" th:value="${ticket.title}">
+
+        <label>優先度</label>
+        <select name="priority">
+            <option value="低" th:selected="${ticket.priority == '低'}">低</option>
+            <option value="中" th:selected="${ticket.priority == '中'}">中</option>
+            <option value="高" th:selected="${ticket.priority == '高'}">高</option>
+        </select>
+
+        <label>ステータス</label>
+
+        <select name="status">
+
+            <option value="未対応" th:selected="${ticket.status == '未対応'}">未対応</option>
+            <option value="対応中" th:selected="${ticket.status == '対応中'}">対応中</option>
+            <option value="完了" th:selected="${ticket.status == '完了'}">完了</option>
+        </select>
+
+        <button type="submit">更新</button>
+    </form>
+
+</body>
+
+</html>
