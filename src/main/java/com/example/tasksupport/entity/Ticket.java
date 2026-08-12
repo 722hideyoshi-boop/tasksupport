@@ -29,6 +29,9 @@ public class Ticket {
     @Column(name = "registration_date")
     private LocalDateTime registrationDate;
 
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
+
     public Integer getId() {
         return id;
     }
@@ -47,6 +50,30 @@ public class Ticket {
 
     public LocalDateTime getRegistrationDate() {
         return registrationDate;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setRegistrationDate(LocalDateTime registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
     }
 
 }
