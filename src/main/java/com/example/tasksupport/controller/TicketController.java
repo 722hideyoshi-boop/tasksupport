@@ -11,8 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import com.example.tasksupport.entity.Ticket;
 import com.example.tasksupport.service.TicketService;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.example.tasksupport.form.TicketRegisterForm;
 
 import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Page;
+
+import org.springframework.data.web.PageableDefault;
+
 
 @Controller
 @RequestMapping("/tickets")
@@ -34,10 +37,11 @@ public class TicketController {
     @GetMapping
     public String index(
             @RequestParam(name = "status", required = false) String status,
-            @RequestParam(name = "title", required = false) String title, Pageable pageable,
+            @RequestParam(name = "title", required = false) String title, 
+            @PageableDefault(size = 10) Pageable pageable,
             Model model) {
 
-        List<Ticket> tickets = ticketService.findTickets(title, status);
+        Page<Ticket> tickets = ticketService.findTickets(title, status, pageable);
         model.addAttribute("tickets", tickets);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("title", title);
