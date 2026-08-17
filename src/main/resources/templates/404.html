@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>問い合わせが見つかりません</title>
+</head>
+
+<body>
+
+    <h1>404 - 問い合わせが見つかりません</h1>
+
+    <p th:text="${message}">
+        問い合わせが見つかりません。
+    </p>
+
+    <a th:href="@{/tickets}">
+        問い合わせ一覧へ戻る
+    </a>
+
+</body>
+
+</html>
