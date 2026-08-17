@@ -1,0 +1,104 @@
+package com.example.tasksupport.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.example.tasksupport.service.TicketService;
+
+import org.springframework.security.test.context.support.WithMockUser;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import static org.mockito.Mockito.doNothing;
+
+import static org.mockito.Mockito.when;
+
+import com.example.tasksupport.exception.TicketNotFoundException;
+
+import com.example.tasksupport.entity.Ticket;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+public class TicketControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private TicketService ticketService;
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void 存在しない問い合わせIDなら404になる() throws Exception {
+
+        when(ticketService.findTicketById(999999))
+                .thenThrow(new TicketNotFoundException("問い合わせが見つかりません。"));
+
+        mockMvc.perform(
+                get("/tickets/999999/edit"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = "USER")
+    void 一般ユーザーは編集画面へアクセスできない() throws Exception {
+
+        mockMvc.perform(
+                get("/tickets/1/edit"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void 不正なID形式なら400になる() throws Exception {
+
+        mockMvc.perform(
+                get("/tickets/abc/edit"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = "USER")
+    void 一般ユーザーは削除できない() throws Exception {
+
+        mockMvc.perform(
+                post("/tickets/1/delete"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void 管理者は削除処理へアクセスできる() throws Exception {
+
+        doNothing().when(ticketService).deleteTicket(1);
+
+        mockMvc.perform(
+                post("/tickets/1/delete")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void 管理者は編集画面へアクセスできる() throws Exception {
+
+        Ticket ticket = new Ticket();
+
+        when(ticketService.findTicketById(1))
+                .thenReturn(ticket);
+
+        mockMvc.perform(
+                get("/tickets/1/edit"))
+                .andExpect(status().isOk());
+    }
+}

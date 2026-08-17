@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.domain.Page;
 
+import com.example.tasksupport.exception.TicketNotFoundException;
+
 @Service
 public class TicketService {
 
@@ -55,7 +57,7 @@ public class TicketService {
 
     public Ticket findTicketById(Integer id) {
 
-        return ticketRepository.findById(id).orElseThrow();
+        return ticketRepository.findById(id).orElseThrow(() -> new TicketNotFoundException("問い合わせが見つかりません。"));
     }
 
     public void updateTicket(Integer id, String title, String priority, String status) {
@@ -69,8 +71,8 @@ public class TicketService {
     }
 
     public void deleteTicket(Integer id) {
-
-        ticketRepository.deleteById(id);
+        Ticket ticket = findTicketById(id);
+        ticketRepository.delete(ticket);
 
     }
 }
