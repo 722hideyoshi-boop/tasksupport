@@ -10,28 +10,34 @@
 
     <h1>問い合わせ編集</h1>
 
-    <form th:action="@{/tickets/{id}/update(id=${ticket.id})}" method="post">
+    <form th:action="@{/tickets/{id}/update(id=${ticketId})}" th:object="${ticketEditForm}" method="post">
+
         <label>タイトル</label>
 
-        <input type="text" name="title" th:value="${ticket.title}">
+        <input type="text" th:field="*{title}">
+
+        <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+            タイトルの入力エラー
+        </p>
 
         <label>優先度</label>
-        <select name="priority">
-            <option value="低" th:selected="${ticket.priority == '低'}">低</option>
-            <option value="中" th:selected="${ticket.priority == '中'}">中</option>
-            <option value="高" th:selected="${ticket.priority == '高'}">高</option>
+
+        <select th:field="*{priority}">
+            <option value="低">低</option>
+            <option value="中">中</option>
+            <option value="高">高</option>
         </select>
 
         <label>ステータス</label>
 
-        <select name="status">
-
-            <option value="未対応" th:selected="${ticket.status == '未対応'}">未対応</option>
-            <option value="対応中" th:selected="${ticket.status == '対応中'}">対応中</option>
-            <option value="完了" th:selected="${ticket.status == '完了'}">完了</option>
+        <select th:field="*{status}">
+            <option value="未対応">未対応</option>
+            <option value="対応中">対応中</option>
+            <option value="完了">完了</option>
         </select>
 
         <button type="submit">更新</button>
+
     </form>
 
 </body>
