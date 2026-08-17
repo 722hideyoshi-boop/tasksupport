@@ -27,78 +27,97 @@ import com.example.tasksupport.exception.TicketNotFoundException;
 
 import com.example.tasksupport.entity.Ticket;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.mockito.Mockito.verifyNoInteractions;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TicketControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @MockitoBean
-    private TicketService ticketService;
+        @MockitoBean
+        private TicketService ticketService;
 
-    @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void 存在しない問い合わせIDなら404になる() throws Exception {
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 存在しない問い合わせIDなら404になる() throws Exception {
 
-        when(ticketService.findTicketById(999999))
-                .thenThrow(new TicketNotFoundException("問い合わせが見つかりません。"));
+                when(ticketService.findTicketById(999999))
+                                .thenThrow(new TicketNotFoundException("問い合わせが見つかりません。"));
 
-        mockMvc.perform(
-                get("/tickets/999999/edit"))
-                .andExpect(status().isNotFound());
-    }
+                mockMvc.perform(
+                                get("/tickets/999999/edit"))
+                                .andExpect(status().isNotFound());
+        }
 
-    @Test
-    @WithMockUser(username = "user", roles = "USER")
-    void 一般ユーザーは編集画面へアクセスできない() throws Exception {
+        @Test
+        @WithMockUser(username = "user", roles = "USER")
+        void 一般ユーザーは編集画面へアクセスできない() throws Exception {
 
-        mockMvc.perform(
-                get("/tickets/1/edit"))
-                .andExpect(status().isForbidden());
-    }
+                mockMvc.perform(
+                                get("/tickets/1/edit"))
+                                .andExpect(status().isForbidden());
+        }
 
-    @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void 不正なID形式なら400になる() throws Exception {
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 不正なID形式なら400になる() throws Exception {
 
-        mockMvc.perform(
-                get("/tickets/abc/edit"))
-                .andExpect(status().isBadRequest());
-    }
+                mockMvc.perform(
+                                get("/tickets/abc/edit"))
+                                .andExpect(status().isBadRequest());
+        }
 
-    @Test
-    @WithMockUser(username = "user", roles = "USER")
-    void 一般ユーザーは削除できない() throws Exception {
+        @Test
+        @WithMockUser(username = "user", roles = "USER")
+        void 一般ユーザーは削除できない() throws Exception {
 
-        mockMvc.perform(
-                post("/tickets/1/delete"))
-                .andExpect(status().isForbidden());
-    }
+                mockMvc.perform(
+                                post("/tickets/1/delete"))
+                                .andExpect(status().isForbidden());
+        }
 
-    @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void 管理者は削除処理へアクセスできる() throws Exception {
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 管理者は削除処理へアクセスできる() throws Exception {
 
-        doNothing().when(ticketService).deleteTicket(1);
+                doNothing().when(ticketService).deleteTicket(1);
 
-        mockMvc.perform(
-                post("/tickets/1/delete")
-                        .with(csrf()))
-                .andExpect(status().is3xxRedirection());
-    }
+                mockMvc.perform(
+                                post("/tickets/1/delete")
+                                                .with(csrf()))
+                                .andExpect(status().is3xxRedirection());
+        }
 
-    @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void 管理者は編集画面へアクセスできる() throws Exception {
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 管理者は編集画面へアクセスできる() throws Exception {
 
-        Ticket ticket = new Ticket();
+                Ticket ticket = new Ticket();
 
-        when(ticketService.findTicketById(1))
-                .thenReturn(ticket);
+                when(ticketService.findTicketById(1))
+                                .thenReturn(ticket);
 
-        mockMvc.perform(
-                get("/tickets/1/edit"))
-                .andExpect(status().isOk());
-    }
+                mockMvc.perform(
+                                get("/tickets/1/edit"))
+                                .andExpect(status().isOk());
+        }
+
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 編集時にタイトルが空欄なら更新されず編集画面を再表示する() throws Exception {
+
+                mockMvc.perform(
+                                post("/tickets/1/update")
+                                                .with(csrf())
+                                                .param("title", "")
+                                                .param("priority", "高")
+                                                .param("status", "未対応"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("edit"));
+
+                verifyNoInteractions(ticketService);
+        }
 }

@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 
 import org.springframework.data.web.PageableDefault;
 
+import com.example.tasksupport.form.TicketEditForm;
 
 @Controller
 @RequestMapping("/tickets")
@@ -37,7 +38,7 @@ public class TicketController {
     @GetMapping
     public String index(
             @RequestParam(name = "status", required = false) String status,
-            @RequestParam(name = "title", required = false) String title, 
+            @RequestParam(name = "title", required = false) String title,
             @PageableDefault(size = 10) Pageable pageable,
             Model model) {
 
@@ -63,7 +64,14 @@ public class TicketController {
     public String edit(@PathVariable Integer id, Model model) {
         Ticket ticket = ticketService.findTicketById(id);
 
-        model.addAttribute("ticket", ticket);
+        TicketEditForm ticketEditForm = new TicketEditForm();
+
+        ticketEditForm.setTitle(ticket.getTitle());
+        ticketEditForm.setPriority(ticket.getPriority());
+        ticketEditForm.setStatus(ticket.getStatus());
+
+        model.addAttribute("ticketEditForm", ticketEditForm);
+        model.addAttribute("ticketId", id);
 
         return "edit";
     }
@@ -85,10 +93,24 @@ public class TicketController {
     }
 
     @PostMapping("/{id}/update")
-    public String update(@PathVariable Integer id, @RequestParam String title, @RequestParam String priority,
-            @RequestParam String status) {
+    public String update(
+            @PathVariable Integer id,
+            @Validated TicketEditForm ticketEditForm,
+            BindingResult bindingResult,
+            Model model) {
 
-        ticketService.updateTicket(id, title, priority, status);
+        if (bindingResult.hasErrors()) {
+
+            model.addAttribute("ticketId", id);
+
+            return "edit";
+        }
+
+        ticketService.updateTicket(
+                id,
+                ticketEditForm.getTitle(),
+                ticketEditForm.getPriority(),
+                ticketEditForm.getStatus());
 
         return "redirect:/tickets";
     }
