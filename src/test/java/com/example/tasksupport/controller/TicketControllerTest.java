@@ -30,6 +30,8 @@ import com.example.tasksupport.entity.Ticket;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TicketControllerTest {
@@ -120,5 +122,83 @@ public class TicketControllerTest {
                                 .andExpect(view().name("edit"));
 
                 verifyNoInteractions(ticketService);
+        }
+
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 管理者は詳細画面へアクセスできる() throws Exception {
+
+                Ticket ticket = new Ticket();
+
+                when(ticketService.findTicketById(49))
+                                .thenReturn(ticket);
+
+                mockMvc.perform(
+                                get("/tickets/49/detail"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("detail"))
+                                .andExpect(model().attribute("ticket", ticket));
+        }
+
+        @Test
+        @WithMockUser(username = "user", roles = "USER")
+        void 一般ユーザーは詳細画面へアクセスできる() throws Exception {
+
+                Ticket ticket = new Ticket();
+
+                when(ticketService.findTicketById(49))
+                                .thenReturn(ticket);
+
+                mockMvc.perform(
+                                get("/tickets/49/detail"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("detail"));
+        }
+
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 詳細画面で存在しない問い合わせIDなら404になる() throws Exception {
+
+                when(ticketService.findTicketById(999999))
+                                .thenThrow(new TicketNotFoundException("問い合わせが見つかりません。"));
+
+                mockMvc.perform(
+                                get("/tickets/999999/detail"))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 詳細画面へ一覧状態を引き継げる() throws Exception {
+
+                Ticket ticket = new Ticket();
+
+                when(ticketService.findTicketById(49))
+                                .thenReturn(ticket);
+
+                mockMvc.perform(
+                                get("/tickets/49/detail")
+                                                .param("page", "2")
+                                                .param("title", "ログイン")
+                                                .param("status", "未対応"))
+                                .andExpect(status().isOk())
+                                .andExpect(model().attribute("page", 2))
+                                .andExpect(model().attribute("title", "ログイン"))
+                                .andExpect(model().attribute("status", "未対応"));
+        }
+
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 詳細画面でpage未指定なら0になる() throws Exception {
+
+                Ticket ticket = new Ticket();
+
+                when(ticketService.findTicketById(49))
+                                .thenReturn(ticket);
+
+                mockMvc.perform(
+                                get("/tickets/49/detail"))
+                                .andExpect(status().isOk())
+                                .andExpect(model().attribute("page", 0));
         }
 }

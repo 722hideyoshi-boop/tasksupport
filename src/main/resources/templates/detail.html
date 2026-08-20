@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>問い合わせ詳細</title>
+</head>
+
+<body>
+
+    <h1>問い合わせ詳細</h1>
+
+    <div>
+        <p>
+            ID:
+            <span th:text="${ticket.id}"></span>
+        </p>
+
+        <p>
+            タイトル:
+            <span th:text="${ticket.title}"></span>
+        </p>
+
+        <p>
+            優先度:
+            <span th:text="${ticket.priority}"></span>
+        </p>
+
+        <p>
+            ステータス:
+            <span th:text="${ticket.status}"></span>
+        </p>
+
+        <p>
+            登録日時:
+            <span th:text="${#temporals.format(ticket.registrationDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        </p>
+
+        <p>
+            最終更新日時:
+            <span th:text="${#temporals.format(ticket.updatedDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        </p>
+    </div>
+
+    <a th:href="@{/tickets(
+        page=${page},
+        title=${title},
+        status=${status}
+    )}">
+        問い合わせ一覧へ戻る
+    </a>
+
+</body>
+
+</html>
