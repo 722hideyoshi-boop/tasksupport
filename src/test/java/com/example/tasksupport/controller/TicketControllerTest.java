@@ -75,7 +75,8 @@ public class TicketControllerTest {
         void 一般ユーザーは削除できない() throws Exception {
 
                 mockMvc.perform(
-                                post("/tickets/1/delete"))
+                                post("/tickets/1/delete")
+                                                .with(csrf()))
                                 .andExpect(status().isForbidden());
         }
 
