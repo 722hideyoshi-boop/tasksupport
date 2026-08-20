@@ -70,6 +70,14 @@
                     最終更新日時
                 </td>
                 <td>
+
+                    <a th:href="@{/tickets/{id}/detail(
+                        id=${ticket.id}, 
+                        page=${tickets.number}, 
+                        title=${title}, 
+                        status=${selectedStatus})}">
+                        詳細</a>
+
                     <a sec:authorize="hasRole('ADMIN')" th:href="@{/tickets/{id}/edit(id=${ticket.id})}">編集</a>
 
                     <form th:action="@{/tickets/{id}/delete(id=${ticket.id})}" method="post"

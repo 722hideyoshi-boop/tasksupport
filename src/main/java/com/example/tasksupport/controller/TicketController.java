@@ -122,4 +122,21 @@ public class TicketController {
 
         return "redirect:/tickets";
     }
+
+    @GetMapping("/{id}/detail")
+    public String detail(@PathVariable Integer id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String status,
+            Model model) {
+
+        Ticket ticket = ticketService.findTicketById(id);
+
+        model.addAttribute("ticket", ticket);
+        model.addAttribute("page", page);
+        model.addAttribute("title", title);
+        model.addAttribute("status", status);
+
+        return "detail";
+    }
 }
