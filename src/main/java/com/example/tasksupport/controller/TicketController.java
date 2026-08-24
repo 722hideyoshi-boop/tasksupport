@@ -40,12 +40,14 @@ public class TicketController {
             @RequestParam(name = "status", required = false) String status,
             @RequestParam(name = "title", required = false) String title,
             @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(defaultValue = "registrationDesc") String sort,
             Model model) {
 
-        Page<Ticket> tickets = ticketService.findTickets(title, status, pageable);
+        Page<Ticket> tickets = ticketService.findTickets(title, status, pageable, sort);
         model.addAttribute("tickets", tickets);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("title", title);
+        model.addAttribute("sort", sort);
 
         return "index";
     }
@@ -128,6 +130,7 @@ public class TicketController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "registrationDesc") String sort,
             Model model) {
 
         Ticket ticket = ticketService.findTicketById(id);
@@ -136,6 +139,7 @@ public class TicketController {
         model.addAttribute("page", page);
         model.addAttribute("title", title);
         model.addAttribute("status", status);
+        model.addAttribute("sort", sort);
 
         return "detail";
     }

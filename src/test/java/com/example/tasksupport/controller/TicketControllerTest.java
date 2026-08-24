@@ -32,6 +32,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TicketControllerTest {
@@ -180,11 +187,13 @@ public class TicketControllerTest {
                                 get("/tickets/49/detail")
                                                 .param("page", "2")
                                                 .param("title", "ログイン")
-                                                .param("status", "未対応"))
+                                                .param("status", "未対応")
+                                                .param("sort", "updatedDesc"))
                                 .andExpect(status().isOk())
                                 .andExpect(model().attribute("page", 2))
                                 .andExpect(model().attribute("title", "ログイン"))
-                                .andExpect(model().attribute("status", "未対応"));
+                                .andExpect(model().attribute("status", "未対応"))
+                                .andExpect(model().attribute("sort", "updatedDesc"));
         }
 
         @Test
@@ -200,5 +209,50 @@ public class TicketControllerTest {
                                 get("/tickets/49/detail"))
                                 .andExpect(status().isOk())
                                 .andExpect(model().attribute("page", 0));
+        }
+
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 一覧画面で並び順を指定したら値がServiceへ渡っている() throws Exception {
+
+                when(ticketService.findTickets(
+                                any(),
+                                any(),
+                                any(Pageable.class),
+                                eq("updatedDesc")))
+                                .thenReturn(Page.empty());
+
+                mockMvc.perform(
+                                get("/tickets")
+                                                .param("sort", "updatedDesc"))
+                                .andExpect(status().isOk());
+
+                verify(ticketService).findTickets(
+                                any(),
+                                any(),
+                                any(Pageable.class),
+                                eq("updatedDesc"));
+        }
+
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void 一覧画面でsort未指定なら登録日時の新しい順になる() throws Exception {
+
+                when(ticketService.findTickets(
+                                any(),
+                                any(),
+                                any(Pageable.class),
+                                eq("registrationDesc")))
+                                .thenReturn(Page.empty());
+
+                mockMvc.perform(
+                                get("/tickets"))
+                                .andExpect(status().isOk());
+
+                verify(ticketService).findTickets(
+                                any(),
+                                any(),
+                                any(Pageable.class),
+                                eq("registrationDesc"));
         }
 }
