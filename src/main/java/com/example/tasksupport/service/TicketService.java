@@ -13,6 +13,9 @@ import org.springframework.data.domain.Page;
 
 import com.example.tasksupport.exception.TicketNotFoundException;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
+
 @Service
 public class TicketService {
 
@@ -22,24 +25,69 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
-    public Page<Ticket> findTickets(String title, String status, Pageable pageable) {
+    public Page<Ticket> findTickets(
+            String title,
+            String status,
+            Pageable pageable,
+            String sort) {
 
         boolean hasTitle = title != null && !title.isEmpty();
         boolean hasStatus = status != null && !status.isEmpty();
 
+        Sort sortCondition;
+
+        switch (sort) {
+            case "registrationAsc":
+                sortCondition = Sort.by(
+                        Sort.Direction.ASC,
+                        "registrationDate");
+                break;
+
+            case "updatedDesc":
+                sortCondition = Sort.by(
+                        Sort.Direction.DESC,
+                        "updatedDate");
+                break;
+
+            case "updatedAsc":
+                sortCondition = Sort.by(
+                        Sort.Direction.ASC,
+                        "updatedDate");
+                break;
+
+            case "registrationDesc":
+            default:
+                sortCondition = Sort.by(
+                        Sort.Direction.DESC,
+                        "registrationDate");
+                break;
+        }
+
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sortCondition);
+
         if (hasTitle && hasStatus) {
-            return ticketRepository.findByTitleContainingAndStatus(title, status, pageable);
+            return ticketRepository.findByTitleContainingAndStatus(
+                    title,
+                    status,
+                    sortedPageable);
         }
 
         if (hasTitle) {
-            return ticketRepository.findByTitleContaining(title, pageable);
+            return ticketRepository.findByTitleContaining(
+                    title,
+                    sortedPageable);
         }
 
         if (hasStatus) {
-            return ticketRepository.findByStatus(status, pageable);
+            return ticketRepository.findByStatus(
+                    status,
+                    sortedPageable);
         }
 
-        return ticketRepository.findAll(pageable);
+        return ticketRepository.findAll(sortedPageable);
     }
 
     public void createTicket(String title, String priority) {

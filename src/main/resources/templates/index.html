@@ -39,6 +39,26 @@
             <option value="対応中" th:selected="${selectedStatus == '対応中'}">対応中</option>
             <option value="完了" th:selected="${selectedStatus == '完了'}">完了</option>
         </select>
+
+        <label for="sort">並び順:</label>
+
+        <select id="sort" name="sort">
+            <option value="registrationDesc" th:selected="${sort == 'registrationDesc'}">
+                登録日時：新しい順
+            </option>
+
+            <option value="registrationAsc" th:selected="${sort == 'registrationAsc'}">
+                登録日時：古い順
+            </option>
+
+            <option value="updatedDesc" th:selected="${sort == 'updatedDesc'}">
+                最終更新日時：新しい順
+            </option>
+
+            <option value="updatedAsc" th:selected="${sort == 'updatedAsc'}">
+                最終更新日時：古い順
+            </option>
+        </select>
         <button type="submit">検索</button>
 
 
@@ -75,7 +95,8 @@
                         id=${ticket.id}, 
                         page=${tickets.number}, 
                         title=${title}, 
-                        status=${selectedStatus})}">
+                        status=${selectedStatus},
+                        sort=${sort})}">
                         詳細</a>
 
                     <a sec:authorize="hasRole('ADMIN')" th:href="@{/tickets/{id}/edit(id=${ticket.id})}">編集</a>
@@ -93,17 +114,18 @@
     <div>
 
         <a th:if="${!tickets.first}" th:href="@{/tickets(
-           page=${tickets.number - 1},
-           title=${title},
-           status=${selectedStatus}
-       )}">
+       page=${tickets.number - 1},
+       title=${title},
+       status=${selectedStatus},
+       sort=${sort}
+   )}">
             前へ
         </a>
 
         <span th:each="pageNumber : ${#numbers.sequence(
-            tickets.number > 2 ? tickets.number - 2 : 0,
-            tickets.number + 2 < tickets.totalPages ? tickets.number + 2 : tickets.totalPages - 1
-        )}">
+        tickets.number > 2 ? tickets.number - 2 : 0,
+        tickets.number + 2 < tickets.totalPages ? tickets.number + 2 : tickets.totalPages - 1
+    )}">
 
             <span th:if="${pageNumber == tickets.number}" th:text="${pageNumber + 1}">
                 1
@@ -112,7 +134,8 @@
             <a th:if="${pageNumber != tickets.number}" th:href="@{/tickets(
                page=${pageNumber},
                title=${title},
-               status=${selectedStatus}
+               status=${selectedStatus},
+               sort=${sort}
            )}" th:text="${pageNumber + 1}">
                 1
             </a>
@@ -120,10 +143,11 @@
         </span>
 
         <a th:if="${!tickets.last}" th:href="@{/tickets(
-           page=${tickets.number + 1},
-           title=${title},
-           status=${selectedStatus}
-       )}">
+       page=${tickets.number + 1},
+       title=${title},
+       status=${selectedStatus},
+       sort=${sort}
+   )}">
             次へ
         </a>
 
