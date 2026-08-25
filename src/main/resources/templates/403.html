@@ -3,18 +3,28 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>アクセス権限エラー</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>アクセス権限エラー | TaskSupport</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-    <h1>アクセスできません</h1>
+    <div class="error-page">
 
-    <p>この操作を行う権限がありません。</p>
+        <div class="card error-card">
 
-    <a th:href="@{/tickets}">
-        問い合わせ一覧へ戻る
-    </a>
+            <p class="error-card__code">403</p>
+            <p class="error-card__title">アクセスできません</p>
+            <p class="error-card__message">この操作を行う権限がありません。</p>
+
+            <a class="btn btn-primary" th:href="@{/tickets}">
+                問い合わせ一覧へ戻る
+            </a>
+
+        </div>
+
+    </div>
 
 </body>
 

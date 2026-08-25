@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+    <header class="app-header" th:fragment="header(pageTitle)">
+
+        <div class="app-brand">
+            <span class="app-brand__logo">Task<span>Support</span></span>
+            <span class="page-title" th:text="${pageTitle}">ページタイトル</span>
+        </div>
+
+        <div class="user-area">
+
+            <div class="user-info">
+                <span>ログイン中：</span>
+                <span class="user-info__name" sec:authentication="name">ユーザー名</span>
+                <span class="role-badge role-badge--admin" sec:authorize="hasRole('ADMIN')">ADMIN</span>
+                <span class="role-badge" sec:authorize="hasRole('USER')">USER</span>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-secondary btn-sm">ログアウト</button>
+            </form>
+
+        </div>
+
+    </header>
+
+</body>
+
+</html>

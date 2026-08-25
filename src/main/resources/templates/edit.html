@@ -3,42 +3,54 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>問い合わせ編集</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>問い合わせ編集 | TaskSupport</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-    <h1>問い合わせ編集</h1>
+    <div class="page-container">
 
-    <form th:action="@{/tickets/{id}/update(id=${ticketId})}" th:object="${ticketEditForm}" method="post">
+        <header th:replace="~{fragments/header :: header('問い合わせ編集')}"></header>
 
-        <label>タイトル</label>
+        <form class="card form-card" th:action="@{/tickets/{id}/update(id=${ticketId})}" th:object="${ticketEditForm}"
+            method="post">
 
-        <input type="text" th:field="*{title}">
+            <div class="form-group">
+                <label for="title">タイトル</label>
+                <input type="text" id="title" th:field="*{title}">
+                <p class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                    タイトルの入力エラー
+                </p>
+            </div>
 
-        <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
-            タイトルの入力エラー
-        </p>
+            <div class="form-group">
+                <label for="priority">優先度</label>
+                <select id="priority" th:field="*{priority}">
+                    <option value="低">低</option>
+                    <option value="中">中</option>
+                    <option value="高">高</option>
+                </select>
+            </div>
 
-        <label>優先度</label>
+            <div class="form-group">
+                <label for="status">ステータス</label>
+                <select id="status" th:field="*{status}">
+                    <option value="未対応">未対応</option>
+                    <option value="対応中">対応中</option>
+                    <option value="完了">完了</option>
+                </select>
+            </div>
 
-        <select th:field="*{priority}">
-            <option value="低">低</option>
-            <option value="中">中</option>
-            <option value="高">高</option>
-        </select>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">更新</button>
+                <a class="btn btn-secondary" th:href="@{/tickets}">キャンセル</a>
+            </div>
 
-        <label>ステータス</label>
+        </form>
 
-        <select th:field="*{status}">
-            <option value="未対応">未対応</option>
-            <option value="対応中">対応中</option>
-            <option value="完了">完了</option>
-        </select>
-
-        <button type="submit">更新</button>
-
-    </form>
+    </div>
 
 </body>
 

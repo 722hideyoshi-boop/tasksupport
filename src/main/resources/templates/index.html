@@ -1,157 +1,244 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
-    <title>問い合わせ一覧</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>問い合わせ一覧 | TaskSupport</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
-    <h1>問い合わせ一覧</h1>
 
-    <div>
-        <p>
-            ログイン中：
-            <span sec:authentication="name">ユーザー名</span>
-        </p>
+    <div class="page-container">
 
-        <p sec:authorize="hasRole('ADMIN')">
-            権限：ADMIN
-        </p>
+        <header th:replace="~{fragments/header :: header('問い合わせ一覧')}"></header>
 
-        <p sec:authorize="hasRole('USER')">
-            権限：USER
-        </p>
-    </div>
+        <form class="card filter-bar" th:action="@{/tickets}" method="get">
 
-    <form th:action="@{/logout}" method="post">
-        <button type="submit">ログアウト</button>
-    </form>
+            <div class="form-group filter-bar__title">
+                <label for="title">タイトル</label>
+                <input type="text" id="title" name="title" th:value="${title}" placeholder="タイトルで検索">
+            </div>
 
-    <form th:action="@{/tickets}" method="get">
-        <label for="title">タイトル:</label>
-        <input type="text" id="title" name="title" th:value="${title}">
+            <div class="form-group">
+                <label for="status">ステータス</label>
 
-        <label for="status">ステータス:</label>
-        <select name="status">
-            <option value="" th:selected="${selectedStatus == null or selectedStatus == ''}">すべて</option>
-            <option value="未対応" th:selected="${selectedStatus == '未対応'}">未対応</option>
-            <option value="対応中" th:selected="${selectedStatus == '対応中'}">対応中</option>
-            <option value="完了" th:selected="${selectedStatus == '完了'}">完了</option>
-        </select>
+                <select id="status" name="status">
 
-        <label for="sort">並び順:</label>
+                    <option value="" th:selected="${selectedStatus == null or selectedStatus == ''}">
+                        すべて
+                    </option>
 
-        <select id="sort" name="sort">
-            <option value="registrationDesc" th:selected="${sort == 'registrationDesc'}">
-                登録日時：新しい順
-            </option>
+                    <option value="未対応" th:selected="${selectedStatus == '未対応'}">
+                        未対応
+                    </option>
 
-            <option value="registrationAsc" th:selected="${sort == 'registrationAsc'}">
-                登録日時：古い順
-            </option>
+                    <option value="対応中" th:selected="${selectedStatus == '対応中'}">
+                        対応中
+                    </option>
 
-            <option value="updatedDesc" th:selected="${sort == 'updatedDesc'}">
-                最終更新日時：新しい順
-            </option>
+                    <option value="完了" th:selected="${selectedStatus == '完了'}">
+                        完了
+                    </option>
 
-            <option value="updatedAsc" th:selected="${sort == 'updatedAsc'}">
-                最終更新日時：古い順
-            </option>
-        </select>
-        <button type="submit">検索</button>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="sort">並び順</label>
+
+                <select id="sort" name="sort">
+
+                    <option value="registrationDesc" th:selected="${sort == 'registrationDesc'}">
+                        登録日時：新しい順
+                    </option>
+
+                    <option value="registrationAsc" th:selected="${sort == 'registrationAsc'}">
+                        登録日時：古い順
+                    </option>
+
+                    <option value="updatedDesc" th:selected="${sort == 'updatedDesc'}">
+                        最終更新日時：新しい順
+                    </option>
+
+                    <option value="updatedAsc" th:selected="${sort == 'updatedAsc'}">
+                        最終更新日時：古い順
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="form-group filter-bar__submit">
+                <button type="submit" class="btn btn-primary">検索</button>
+            </div>
+
+        </form>
+
+        <div class="table-toolbar">
+            <span class="table-toolbar__count" th:text="${'全 ' + tickets.totalElements + ' 件'}">全 0 件</span>
+            <a th:href="@{/tickets/new}" class="btn btn-primary btn-sm">＋ 新規登録</a>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="ticket-table">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>タイトル</th>
+                        <th>優先度</th>
+                        <th>ステータス</th>
+                        <th>登録日時</th>
+                        <th>最終更新日時</th>
+                        <th>操作</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="ticket : ${tickets}">
+
+                        <td th:text="${ticket.id}">
+                            ID
+                        </td>
+
+                        <td class="col-title" th:text="${ticket.title}">
+                            タイトル
+                        </td>
+
+                        <td th:switch="${ticket.priority}">
+                            <span th:case="'高'" class="badge badge-priority-high">高</span>
+                            <span th:case="'中'" class="badge badge-priority-medium">中</span>
+                            <span th:case="'低'" class="badge badge-priority-low">低</span>
+                            <span th:case="*" th:text="${ticket.priority}">優先度</span>
+                        </td>
+
+                        <td th:switch="${ticket.status}">
+                            <span th:case="'未対応'" class="badge badge-status-todo">未対応</span>
+                            <span th:case="'対応中'" class="badge badge-status-progress">対応中</span>
+                            <span th:case="'完了'" class="badge badge-status-done">完了</span>
+                            <span th:case="*" th:text="${ticket.status}">ステータス</span>
+                        </td>
+
+                        <td th:text="${#temporals.format(
+                            ticket.registrationDate,
+                            'yyyy-MM-dd HH:mm')}">
+                            登録日時
+                        </td>
+
+                        <td th:text="${#temporals.format(
+                            ticket.updatedDate,
+                            'yyyy-MM-dd HH:mm')}">
+                            最終更新日時
+                        </td>
+
+                        <td>
+
+                            <div class="col-actions">
+
+                                <a class="btn btn-secondary btn-sm" th:href="@{/tickets/{id}/detail(
+                                    id=${ticket.id},
+                                    page=${tickets.number},
+                                    title=${title},
+                                    status=${selectedStatus},
+                                    sort=${sort}
+                                )}">
+                                    詳細
+                                </a>
+
+                                <a class="btn btn-secondary btn-sm" sec:authorize="hasRole('ADMIN')"
+                                    th:href="@{/tickets/{id}/edit(
+                                       id=${ticket.id}
+                                   )}">
+                                    編集
+                                </a>
+
+                                <form th:action="@{/tickets/{id}/delete(
+                                          id=${ticket.id}
+                                      )}" method="post" sec:authorize="hasRole('ADMIN')">
+
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('この問い合わせを削除しますか？');">
+                                        削除
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <tr th:if="${tickets.empty}">
+                        <td colspan="7" class="empty-state">
+                            該当する問い合わせが見つかりません。
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
 
-    </form>
+        <div class="pagination" th:if="${tickets.totalPages > 1}">
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>タイトル</th>
-                <th>優先度</th>
-                <th>ステータス</th>
-                <th>登録日時</th>
-                <th>最終更新日時</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr th:each="ticket : ${tickets}">
-                <td th:text="${ticket.id}">ID</td>
-                <td th:text="${ticket.title}">タイトル</td>
-                <td th:text="${ticket.priority}">優先度</td>
-                <td th:text="${ticket.status}">ステータス</td>
-                <td th:text="${#temporals.format(ticket.registrationDate, 'yyyy-MM-dd HH:mm')}">
-                    登録日時
-                </td>
-                <td th:text="${#temporals.format(ticket.updatedDate, 'yyyy-MM-dd HH:mm')}">
-                    最終更新日時
-                </td>
-                <td>
-
-                    <a th:href="@{/tickets/{id}/detail(
-                        id=${ticket.id}, 
-                        page=${tickets.number}, 
-                        title=${title}, 
-                        status=${selectedStatus},
-                        sort=${sort})}">
-                        詳細</a>
-
-                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/tickets/{id}/edit(id=${ticket.id})}">編集</a>
-
-                    <form th:action="@{/tickets/{id}/delete(id=${ticket.id})}" method="post"
-                        sec:authorize="hasRole('ADMIN')">
-
-                        <button type="submit">削除</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div>
-
-        <a th:if="${!tickets.first}" th:href="@{/tickets(
-       page=${tickets.number - 1},
-       title=${title},
-       status=${selectedStatus},
-       sort=${sort}
-   )}">
-            前へ
-        </a>
-
-        <span th:each="pageNumber : ${#numbers.sequence(
-        tickets.number > 2 ? tickets.number - 2 : 0,
-        tickets.number + 2 < tickets.totalPages ? tickets.number + 2 : tickets.totalPages - 1
-    )}">
-
-            <span th:if="${pageNumber == tickets.number}" th:text="${pageNumber + 1}">
-                1
-            </span>
-
-            <a th:if="${pageNumber != tickets.number}" th:href="@{/tickets(
-               page=${pageNumber},
-               title=${title},
-               status=${selectedStatus},
-               sort=${sort}
-           )}" th:text="${pageNumber + 1}">
-                1
+            <a class="pagination__nav" th:if="${!tickets.first}" th:href="@{/tickets(
+                   page=${tickets.number - 1},
+                   title=${title},
+                   status=${selectedStatus},
+                   sort=${sort}
+               )}">
+                前へ
             </a>
 
-        </span>
 
-        <a th:if="${!tickets.last}" th:href="@{/tickets(
-       page=${tickets.number + 1},
-       title=${title},
-       status=${selectedStatus},
-       sort=${sort}
-   )}">
-            次へ
-        </a>
+            <span th:each="pageNumber : ${#numbers.sequence(
+                tickets.number > 2
+                    ? tickets.number - 2
+                    : 0,
+                tickets.number + 2 < tickets.totalPages
+                    ? tickets.number + 2
+                    : tickets.totalPages - 1
+            )}">
+
+                <span th:if="${pageNumber == tickets.number}" class="pagination__current"
+                    th:text="${pageNumber + 1}">
+                    1
+                </span>
+
+                <a th:if="${pageNumber != tickets.number}" th:href="@{/tickets(
+                       page=${pageNumber},
+                       title=${title},
+                       status=${selectedStatus},
+                       sort=${sort}
+                   )}" th:text="${pageNumber + 1}">
+                    1
+                </a>
+
+            </span>
+
+
+            <a class="pagination__nav" th:if="${!tickets.last}" th:href="@{/tickets(
+                   page=${tickets.number + 1},
+                   title=${title},
+                   status=${selectedStatus},
+                   sort=${sort}
+               )}">
+                次へ
+            </a>
+
+        </div>
 
     </div>
+
 </body>
 
 </html>
