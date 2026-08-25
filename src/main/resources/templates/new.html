@@ -3,32 +3,44 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>問い合わせ登録</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>問い合わせ登録 | TaskSupport</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-    <h1>問い合わせ登録</h1>
+    <div class="page-container">
 
-    <form th:action="@{/tickets}" th:object="${ticketRegisterForm}" method="post">
-        <p>タイトル</p>
+        <header th:replace="~{fragments/header :: header('問い合わせ登録')}"></header>
 
-        <input type="text" th:field="*{title}">
+        <form class="card form-card" th:action="@{/tickets}" th:object="${ticketRegisterForm}" method="post">
 
-        <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
-            タイトルの入力エラー
-        </p>
+            <div class="form-group">
+                <label for="title">タイトル</label>
+                <input type="text" id="title" th:field="*{title}">
+                <p class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                    タイトルの入力エラー
+                </p>
+            </div>
 
+            <div class="form-group">
+                <label for="priority">優先度</label>
+                <select id="priority" th:field="*{priority}">
+                    <option value="低">低</option>
+                    <option value="中">中</option>
+                    <option value="高">高</option>
+                </select>
+            </div>
 
-        <p>優先度</p>
-        <select th:field="*{priority}">
-            <option value="低">低</option>
-            <option value="中">中</option>
-            <option value="高">高</option>
-        </select>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">登録</button>
+                <a class="btn btn-secondary" th:href="@{/tickets}">キャンセル</a>
+            </div>
 
-        <button type="submit">登録</button>
-    </form>
+        </form>
+
+    </div>
 
 </body>
 

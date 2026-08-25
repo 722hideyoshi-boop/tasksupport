@@ -3,18 +3,28 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>不正なリクエスト</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>不正なリクエスト | TaskSupport</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-    <h1>400 - 不正なリクエストです</h1>
+    <div class="error-page">
 
-    <p>URLの指定が正しくありません。</p>
+        <div class="card error-card">
 
-    <a th:href="@{/tickets}">
-        問い合わせ一覧へ戻る
-    </a>
+            <p class="error-card__code">400</p>
+            <p class="error-card__title">不正なリクエストです</p>
+            <p class="error-card__message">URLの指定が正しくありません。</p>
+
+            <a class="btn btn-primary" th:href="@{/tickets}">
+                問い合わせ一覧へ戻る
+            </a>
+
+        </div>
+
+    </div>
 
 </body>
 
